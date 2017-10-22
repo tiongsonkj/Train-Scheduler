@@ -49,6 +49,7 @@ $("#submit-btn").on("click", function(event) {
 	var trainName = $("#train-name").val().trim();
 	var trainDestination = $("#destination").val().trim();
 	// edit train time to include MOMENT.JS!!!
+	// do this because we want the value as a moment?
 	var firstTrainTime = $("#train-time").val().trim();
 	var frequency = $("#frequency").val().trim();
 
