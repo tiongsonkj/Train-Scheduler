@@ -16,31 +16,6 @@ var currentTime = setInterval(function(){
     $("#current-time").html(moment(moment()).format("hh:mm:ss"));
     }, 1000);
 
-function getNextTrainTime(firstTime, timeFrequency) {
-
-	// grab value of first train time
-	var originalTime = firstTime;
-
-	// push first time back a year to make sure it is before current time
-	var firstTimeConverted = moment(originalTime, "hh:mm").subtract(1, "years");
-
-	// current time
-	var time = moment();
-
-	// difference between times
-	var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-
-	// remainder of time apart
-	var timeRemainder = diffTime % timeFrequency;
-
-	// minute(s) until train
-	var minutesTillNextTrain = timeFrequency - timeRemainder;
-	console.log("MINUTES TILL NEXT TRAIN: " + minutesTillNextTrain);
-
-	// next train
-	var nextTrain = moment().add(minutesTillNextTrain, "minutes");
-}
-
 // create function with submit button to submit to train schedule
 $("#submit-btn").on("click", function(event) {
 	event.preventDefault();
@@ -64,13 +39,6 @@ $("#submit-btn").on("click", function(event) {
 	// uploads the object train data to the database
 	database.ref().push(newTrain);
 
-
-	// log to console to see new object
-	console.log(newTrain.train);
-	console.log(newTrain.destination);
-	console.log(newTrain.trainTime);
-	console.log(newTrain.minFrequency);
-
 	alert("Great you added a train!");
 
 	// clears each text box
@@ -78,12 +46,6 @@ $("#submit-btn").on("click", function(event) {
 	$("#destination").val("");
 	$("#train-time").val("");
 	$("#frequency").val("");
-
-	// call getTrainTime function here!
-	// use firstTrainTime for parameter!
-	// also use frequency for other parameter!
-	// I THINK THIS IS RIGHT! BUT HOW DO I DISPLAY?!?!
-	getNextTrainTime(firstTrainTime, frequency);
 });
 
 // create firebase event for adding train to database
@@ -94,21 +56,29 @@ database.ref().on("child_added", function(childSnapshot) {
 
 	var name = childSnapshot.val().train;
 	var place = childSnapshot.val().destination;
-	var time = childSnapshot.val().trainTime;
+	var firstTime = childSnapshot.val().trainTime;
 	var minutes = childSnapshot.val().minFrequency;
 
-	// log the variables above which are the train information
-	console.log(name);
-	console.log(place);
-	console.log(time);
-	console.log(minutes);
+  	// train time calculations
+  	// pushed back 1 day to make sure conversion comes before current time
+  	var firstTimeConverted = moment(firstTime, "hh::mm").subtract(1, "days");
 
-	// Prettify the employee start
-  // var empStartPretty = moment.unix(empStart).format("MM/DD/YY");
+  	// difference between times with minutes
+  	var timeDiff = moment().diff(moment(firstTimeConverted), "minutes");
+
+  	// get the remainder which is the time apart
+  	var remainder = timeDiff % minutes;
+
+  	// finds minutes until the next train
+  	var nextTrainMinutes = minutes - remainder;
+  	
+  	// finds time until next train
+  	var nextTrainTime = moment().add(nextTrainMinutes, "minutes");
 
   // add train data into table
   $("#train-body").append("<tr><td>" + name + "</td><td>" + place + "</td><td>" +
-  minutes + "</td></tr>");
+  minutes + "</td><td>" + moment(nextTrainTime).format("hh:mm") +
+   "</td><td>" + nextTrainMinutes + "</td></tr>");
 
 });
 
