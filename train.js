@@ -39,8 +39,6 @@ $("#submit-btn").on("click", function(event) {
 	// uploads the object train data to the database
 	database.ref().push(newTrain);
 
-	alert("Great you added a train!");
-
 	// clears each text box
 	$("#train-name").val("");
 	$("#destination").val("");
@@ -51,8 +49,6 @@ $("#submit-btn").on("click", function(event) {
 // create firebase event for adding train to database
 // and a row in the html when a user adds an entry
 database.ref().on("child_added", function(childSnapshot) {
-
-	console.log(childSnapshot.val());
 
 	var name = childSnapshot.val().train;
 	var place = childSnapshot.val().destination;
